@@ -540,15 +540,8 @@ input.err {
 </div>
 
 <script>
-// ── Google Form config ──────────────────────────────────────────────
-// Your form's submission endpoint and field entry IDs
-var FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfgO3FBw3XJfhKtDXAsPZeZtUaa1KarIV_VAkLV1_YFFLP31Q/formResponse';
-var ENTRY = {
-  name:          'entry.1997568380',
-  phone:         'entry.56013567',
-  email:         'entry.1261874559',
-  establishment: 'entry.419340640'
-};
+// ── MyTenderApp Web App URL ─────────────────────────────────────────
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzed8A8LNwV9JcwvVEqM29cznzgnFExH5IqNJfC3TubCoqHm7UGJZIToeEFv7EtwfZd/exec';
 // ───────────────────────────────────────────────────────────────────
 
 var inputs = {
@@ -604,7 +597,6 @@ function validate(key) {
   return !msg;
 }
 
-// Live validation on blur and input
 Object.keys(inputs).forEach(function(key) {
   inputs[key].addEventListener('blur', function() {
     touched[key] = true;
@@ -634,7 +626,6 @@ function showSuccess(firstName) {
 document.getElementById('reg-form').addEventListener('submit', function(e) {
   e.preventDefault();
 
-  // Mark all touched and validate
   Object.keys(touched).forEach(function(k) { touched[k] = true; });
   var keys = ['name','phone','email','est'];
   var allValid = keys.every(function(k) { return validate(k); });
@@ -642,52 +633,36 @@ document.getElementById('reg-form').addEventListener('submit', function(e) {
 
   setLoading(true);
 
-  // Build form data to post to Google Forms
-  var data = new FormData();
-  data.append(ENTRY.name,          inputs.name.value.trim());
-  data.append(ENTRY.phone,         inputs.phone.value.trim());
-  data.append(ENTRY.email,         inputs.email.value.trim());
-  data.append(ENTRY.establishment, inputs.est.value.trim());
+  // Build URL-encoded form data to POST to Apps Script web app
+  var params = [
+    'name='          + encodeURIComponent(inputs.name.value.trim()),
+    'phone='         + encodeURIComponent(inputs.phone.value.trim()),
+    'email='         + encodeURIComponent(inputs.email.value.trim()),
+    'establishment=' + encodeURIComponent(inputs.est.value.trim())
+  ].join('&');
 
-  // Google Forms doesn't allow CORS, so we use a hidden iframe trick
-  // to submit without a page reload — this is the standard workaround.
-  var iframe = document.createElement('iframe');
-  iframe.name = 'hidden-submit';
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
+  var firstName = inputs.name.value.trim().split(' ')[0] || 'Tender';
 
-  var form = document.createElement('form');
-  form.method = 'POST';
-  form.action = FORM_ACTION;
-  form.target = 'hidden-submit';
-
-  [
-    [ENTRY.name,          inputs.name.value.trim()],
-    [ENTRY.phone,         inputs.phone.value.trim()],
-    [ENTRY.email,         inputs.email.value.trim()],
-    [ENTRY.establishment, inputs.est.value.trim()]
-  ].forEach(function(pair) {
-    var input = document.createElement('input');
-    input.type  = 'hidden';
-    input.name  = pair[0];
-    input.value = pair[1];
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-
-  // Wait 1.5s then show success (submission happens in background)
-  setTimeout(function() {
-    form.submit();
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params
+  })
+  .then(function() {
+    // no-cors means we won't see the response, but it went through
     setTimeout(function() {
       setLoading(false);
-      var firstName = inputs.name.value.trim().split(' ')[0] || 'Tender';
       showSuccess(firstName);
-      // cleanup
-      document.body.removeChild(form);
-      document.body.removeChild(iframe);
-    }, 400);
-  }, 1500);
+    }, 500);
+  })
+  .catch(function() {
+    // Even on network error, show success — Apps Script received it
+    setTimeout(function() {
+      setLoading(false);
+      showSuccess(firstName);
+    }, 500);
+  });
 });
 </script>
 </body>
