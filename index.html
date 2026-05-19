@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MyTenderApp — Founding Tender Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold:        #C9A84C;
+  --gold-light:  #E8C96A;
+  --gold-glow:   rgba(201,168,76,0.18);
+  --gold-border: rgba(201,168,76,0.55);
+  --bg:          #0C0B09;
+  --card:        #131210;
+  --card-edge:   #1E1C17;
+  --input-bg:    #0F0E0C;
+  --input-border:#2A2620;
+  --text:        #E8E0D0;
+  --text-muted:  #7A7060;
+  --text-dim:    #4A4540;
+  --error:       #C96C4C;
+}
+
+html, body {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px 60px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Atmospheric glow */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 15%, rgba(201,168,76,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 85%, rgba(180,100,40,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  background-size: 180px;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+}
+
+/* ── CARD ── */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 40px 80px rgba(0,0,0,0.75),
+    0 0 120px rgba(201,168,76,0.05);
+  animation: card-in 0.85s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.gold-bar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 35%, var(--gold-light) 65%, transparent 100%);
+  opacity: 0.85;
+}
+
+.card-inner { padding: 46px 42px 50px; }
+
+@media (max-width: 520px) {
+  .card-inner { padding: 34px 26px 42px; }
+  body { padding: 24px 16px 48px; }
+}
+
+/* ── LOGO ── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 34px;
+  animation: fade-up 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both;
+}
+
+.logo-text {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* ── HERO ── */
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 7vw, 44px);
+  font-weight: 900;
+  line-height: 1.07;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  animation: fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.18s both;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.subhead {
+  font-size: 14.5px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 34px;
+  letter-spacing: 0.01em;
+  animation: fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.26s both;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+  animation: fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.32s both;
+}
+
+.divider-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-edge));
+}
+.divider-line:last-child {
+  background: linear-gradient(270deg, transparent, var(--card-edge));
+}
+.divider-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0.5;
+}
+
+/* ── FORM ── */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: fade-up 0.7s cubic-bezier(0.22,1,0.36,1) 0.4s both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  transition: color 0.2s;
+}
+
+.field:focus-within label { color: var(--gold); }
+
+input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 3px;
+  padding: 13px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+  -webkit-appearance: none;
+  caret-color: var(--gold);
+}
+
+input::placeholder {
+  color: var(--text-dim);
+  font-weight: 300;
+  font-style: italic;
+}
+
+input:hover { border-color: rgba(201,168,76,0.2); }
+
+input:focus {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 0 3px var(--gold-glow), inset 0 1px 3px rgba(0,0,0,0.4);
+  background: #100F0D;
+}
+
+input.err {
+  border-color: rgba(201,108,76,0.5);
+  box-shadow: 0 0 0 3px rgba(201,108,76,0.08);
+}
+
+.errmsg {
+  display: none;
+  font-size: 12px;
+  color: var(--error);
+  align-items: center;
+  gap: 6px;
+  animation: shake 0.3s ease;
+}
+
+.errmsg.show { display: flex; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
+}
+
+/* ── BUTTON ── */
+.submit-btn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 15px 24px;
+  background: linear-gradient(135deg, var(--gold) 0%, #B8903E 60%, #A07830 100%);
+  border: none;
+  border-radius: 3px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #0C0B09;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.22), 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.55s ease;
+}
+
+.submit-btn:hover:not(:disabled)::before { transform: translateX(120%); }
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(201,168,76,0.38), 0 2px 8px rgba(0,0,0,0.5);
+}
+.submit-btn:active:not(:disabled) { transform: translateY(0px); }
+.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.btn-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.spinner {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(12,11,9,0.3);
+  border-top-color: #0C0B09;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.privacy {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--text-dim);
+  margin-top: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* ── SUCCESS STATE ── */
+.success {
+  display: none;
+  text-align: center;
+  padding: 8px 0 4px;
+  animation: fade-up 0.65s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+.success.show { display: block; }
+
+.success-ring {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  animation: pulse-ring 2.8s ease infinite;
+}
+
+@keyframes pulse-ring {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.28); }
+  50%      { box-shadow: 0 0 0 14px rgba(201,168,76,0); }
+}
+
+.check-path {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  animation: draw-check 0.6s ease 0.35s forwards;
+}
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.2;
+}
+.success-title span { color: var(--gold); }
+
+.success-body {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-muted);
+  line-height: 1.75;
+  max-width: 340px;
+  margin: 0 auto 30px;
+}
+
+.pills {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--card-edge);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.02);
+}
+
+.pill-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: dot-pulse 2s ease infinite;
+}
+@keyframes dot-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── FOOTER ── */
+.card-footer {
+  border-top: 1px solid var(--card-edge);
+  padding: 16px 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+@media (max-width: 520px) {
+  .card-footer { padding: 14px 26px; }
+}
+
+.footer-text {
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.footer-badges { display: flex; gap: 9px; }
+
+.fbadge {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 4px 9px;
+  border: 1px solid var(--card-edge);
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="gold-bar"></div>
+
+  <div class="card-inner">
+
+    <!-- Logo -->
+    <div class="logo">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M9 5l2.5 12L16 22l4.5-5L23 5H9z" stroke="#C9A84C" stroke-width="1.2" stroke-linejoin="round" fill="none" opacity="0.9"/>
+        <path d="M13 22v4M19 22v4M11 26h10" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M9 5h14" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="16" cy="13" r="2.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.35"/>
+      </svg>
+      <span class="logo-text">mytenderapp</span>
+    </div>
+
+    <!-- Form view -->
+    <div id="form-view">
+      <h1>Let's build <em>your</em><br>brand &amp; fan base.</h1>
+      <p class="subhead">MyTenderApp is the first platform built around the person behind the bar — your skills, your shifts, your regulars. Reserve your Founding Tender spot before we launch.</p>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-dot"></div>
+        <div class="divider-line"></div>
+      </div>
+
+      <form id="reg-form" novalidate>
+
+        <div class="field">
+          <label for="f-name">Full Name</label>
+          <input id="f-name" type="text" autocomplete="name" placeholder="Your name behind the bar">
+          <span class="errmsg" id="e-name" role="alert">
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.6" fill="none"/><circle cx="5" cy="5" r="1.8" fill="#C9A84C" opacity="0.8"/></svg>
+            <span id="e-name-txt">We'd love to know your name.</span>
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="f-phone">Phone Number</label>
+          <input id="f-phone" type="tel" autocomplete="tel" placeholder="+1 (312) 000-0000">
+          <span class="errmsg" id="e-phone" role="alert">
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.6" fill="none"/><circle cx="5" cy="5" r="1.8" fill="#C9A84C" opacity="0.8"/></svg>
+            <span id="e-phone-txt">Please enter a valid phone number.</span>
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="f-email">Email Address</label>
+          <input id="f-email" type="email" autocomplete="email" placeholder="you@example.com">
+          <span class="errmsg" id="e-email" role="alert">
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.6" fill="none"/><circle cx="5" cy="5" r="1.8" fill="#C9A84C" opacity="0.8"/></svg>
+            <span id="e-email-txt">Please enter a valid email address.</span>
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="f-est">Current Establishment</label>
+          <input id="f-est" type="text" autocomplete="organization" placeholder="Where are you currently pouring?">
+          <span class="errmsg" id="e-est" role="alert">
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.6" fill="none"/><circle cx="5" cy="5" r="1.8" fill="#C9A84C" opacity="0.8"/></svg>
+            <span id="e-est-txt">Let us know where you're currently pouring.</span>
+          </span>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <div class="btn-inner" id="btn-inner">
+            <span>Claim My Spot</span>
+          </div>
+        </button>
+
+        <p class="privacy">No spam. No pressure. Your information is never shared.</p>
+
+      </form>
+    </div>
+
+    <!-- Success view (hidden until submit) -->
+    <div class="success" id="success-view">
+      <div class="success-ring">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path class="check-path" d="M7 14.5l5.5 5.5 8.5-9.5"
+            stroke="#C9A84C" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="26" stroke-dashoffset="26"/>
+        </svg>
+      </div>
+      <div class="success-title">You're <span>in</span>, <span id="first-name">Tender</span>.</div>
+      <p class="success-body">Your spot is reserved. We'll be in touch before launch with everything you need to claim your Founding Tender profile — and start building your following from day one.</p>
+      <div class="pills">
+        <div class="pill"><span class="pill-dot"></span>Founding Tender Status</div>
+        <div class="pill"><span class="pill-dot" style="animation-delay:0.6s"></span>Early Access</div>
+        <div class="pill"><span class="pill-dot" style="animation-delay:1.1s"></span>Pour Score Bonus</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card-footer">
+    <span class="footer-text">© 2025 MyTenderApp</span>
+    <div class="footer-badges">
+      <span class="fbadge">Founding Tender</span>
+      <span class="fbadge">Early Access</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Google Form config ──────────────────────────────────────────────
+// Your form's submission endpoint and field entry IDs
+var FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfgO3FBw3XJfhKtDXAsPZeZtUaa1KarIV_VAkLV1_YFFLP31Q/formResponse';
+var ENTRY = {
+  name:          'entry.1997568380',
+  phone:         'entry.56013567',
+  email:         'entry.1261874559',
+  establishment: 'entry.419340640'
+};
+// ───────────────────────────────────────────────────────────────────
+
+var inputs = {
+  name:  document.getElementById('f-name'),
+  phone: document.getElementById('f-phone'),
+  email: document.getElementById('f-email'),
+  est:   document.getElementById('f-est')
+};
+
+var errEls = {
+  name:  document.getElementById('e-name'),
+  phone: document.getElementById('e-phone'),
+  email: document.getElementById('e-email'),
+  est:   document.getElementById('e-est')
+};
+
+var errTxts = {
+  name:  document.getElementById('e-name-txt'),
+  phone: document.getElementById('e-phone-txt'),
+  email: document.getElementById('e-email-txt'),
+  est:   document.getElementById('e-est-txt')
+};
+
+var touched = { name: false, phone: false, email: false, est: false };
+
+function validate(key) {
+  var v = inputs[key].value.trim();
+  var msg = '';
+  if (key === 'name') {
+    if (!v)        msg = "We'd love to know your name.";
+    else if (v.length < 2) msg = "Full name must be at least 2 characters.";
+  } else if (key === 'phone') {
+    if (!v)        msg = "A phone number helps us reach you.";
+    else if (!/^\+?[\d\s\-().]{7,15}$/.test(v)) msg = "Please enter a valid phone number.";
+  } else if (key === 'email') {
+    if (!v)        msg = "Your email is how we'll stay in touch.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = "Please enter a valid email address.";
+  } else if (key === 'est') {
+    if (!v)        msg = "Let us know where you're currently pouring.";
+  }
+
+  if (msg && touched[key]) {
+    inputs[key].classList.add('err');
+    errTxts[key].textContent = msg;
+    errEls[key].classList.add('show');
+    errEls[key].style.animation = 'none';
+    void errEls[key].offsetWidth;
+    errEls[key].style.animation = '';
+  } else {
+    inputs[key].classList.remove('err');
+    errEls[key].classList.remove('show');
+  }
+  return !msg;
+}
+
+// Live validation on blur and input
+Object.keys(inputs).forEach(function(key) {
+  inputs[key].addEventListener('blur', function() {
+    touched[key] = true;
+    validate(key);
+  });
+  inputs[key].addEventListener('input', function() {
+    if (touched[key]) validate(key);
+  });
+});
+
+function setLoading(on) {
+  var btn = document.getElementById('submit-btn');
+  var inner = document.getElementById('btn-inner');
+  btn.disabled = on;
+  inner.innerHTML = on
+    ? '<div class="spinner"></div><span>Reserving Your Spot\u2026</span>'
+    : '<span>Claim My Spot</span>';
+}
+
+function showSuccess(firstName) {
+  document.getElementById('form-view').style.display = 'none';
+  document.getElementById('first-name').textContent = firstName;
+  var s = document.getElementById('success-view');
+  s.classList.add('show');
+}
+
+document.getElementById('reg-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // Mark all touched and validate
+  Object.keys(touched).forEach(function(k) { touched[k] = true; });
+  var keys = ['name','phone','email','est'];
+  var allValid = keys.every(function(k) { return validate(k); });
+  if (!allValid) return;
+
+  setLoading(true);
+
+  // Build form data to post to Google Forms
+  var data = new FormData();
+  data.append(ENTRY.name,          inputs.name.value.trim());
+  data.append(ENTRY.phone,         inputs.phone.value.trim());
+  data.append(ENTRY.email,         inputs.email.value.trim());
+  data.append(ENTRY.establishment, inputs.est.value.trim());
+
+  // Google Forms doesn't allow CORS, so we use a hidden iframe trick
+  // to submit without a page reload — this is the standard workaround.
+  var iframe = document.createElement('iframe');
+  iframe.name = 'hidden-submit';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = FORM_ACTION;
+  form.target = 'hidden-submit';
+
+  [
+    [ENTRY.name,          inputs.name.value.trim()],
+    [ENTRY.phone,         inputs.phone.value.trim()],
+    [ENTRY.email,         inputs.email.value.trim()],
+    [ENTRY.establishment, inputs.est.value.trim()]
+  ].forEach(function(pair) {
+    var input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = pair[0];
+    input.value = pair[1];
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+
+  // Wait 1.5s then show success (submission happens in background)
+  setTimeout(function() {
+    form.submit();
+    setTimeout(function() {
+      setLoading(false);
+      var firstName = inputs.name.value.trim().split(' ')[0] || 'Tender';
+      showSuccess(firstName);
+      // cleanup
+      document.body.removeChild(form);
+      document.body.removeChild(iframe);
+    }, 400);
+  }, 1500);
+});
+</script>
+</body>
+</html>
